@@ -1,10 +1,10 @@
 import Channel from '../entities/Channel';
 
+const setTitle = (title: string): void => chrome.browserAction.setTitle({ title });
+
 const setBadgeText = (text: string): void => chrome.browserAction.setBadgeText({ text });
 
 const setBadgeColor = (color: string): void => chrome.browserAction.setBadgeBackgroundColor({ color });
-
-const setIcon = (icon: string): void => chrome.browserAction.setIcon({ path: `icons/${icon}` });
 
 const markAsOnline = (): void => {
   setBadgeText('ON');
@@ -14,6 +14,14 @@ const markAsOnline = (): void => {
 const markAsOffline = (): void => {
   setBadgeText('OFF');
   setBadgeColor('gray');
+};
+
+const updateTitle = (channel: Channel) => {
+  if (channel.online) {
+    setTitle(`${channel.nickname} stream ${channel.stream!.game} devant ${channel.stream!.viewers} viewers`);
+  } else {
+    setTitle(`${channel.nickname} n'est pas en stream`);
+  }
 };
 
 class BrowserActionManager {
@@ -28,6 +36,8 @@ class BrowserActionManager {
     } else {
       markAsOffline();
     }
+
+    updateTitle(this.channels[0]);
   }
 
   private bindOnClick(): void {
