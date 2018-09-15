@@ -1,0 +1,30 @@
+sudo: false
+dist: trusty
+
+language: node_js
+node_js:
+  - "node"
+
+cache:
+  yarn: true
+  directories:
+    - node_modules
+    - ~/.npm
+    - ~/.cache
+
+before_install:
+  - if [ -f $(git rev-parse --git-dir)/shallow ]; then git fetch --unshallow; fi
+  - npm i -g yarn
+
+before_script:
+  - yarn
+
+script:
+  - yarn build
+  - yarn build-zip
+  - test -f dist/manifest.json
+  - test -f dist/background.js
+  - test -f dist/vendor.js
+  - cmp src/icons/icon_48.png dist/icons/icon_48.png
+  - cmp src/icons/icon_128.png dist/icons/icon_128.png
+  - test -f "dist-zip/pepite-live-v$(node -pe "require('./package.json').version").zip"
