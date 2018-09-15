@@ -8,16 +8,23 @@ const { version } = require('./package.json');
 
 const config = {
   mode: process.env.NODE_ENV,
-  context: __dirname + '/src',
+  context: `${__dirname}/src`,
   entry: {
-    'background': './background.js',
+    background: './background.ts',
   },
   output: {
-    path: __dirname + '/dist',
+    path: `${__dirname}/dist`,
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js', '.vue'],
+    extensions: ['.ts', '.tsx', '.js', '.vue'],
+  },
+  optimization: {
+    runtimeChunk: false,
+    splitChunks: {
+      chunks: 'all',
+      name: 'vendor',
+    },
   },
   module: {
     rules: [
@@ -29,6 +36,14 @@ const config = {
         test: /\.js$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
+      },
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+        },
       },
       {
         test: /\.css$/,
@@ -58,15 +73,16 @@ const config = {
     }),
     new CopyWebpackPlugin([
       { from: 'icons', to: 'icons', ignore: ['icon.xcf'] },
+      { from: 'assets', to: 'assets' },
       {
         from: 'manifest.json',
         to: 'manifest.json',
-        transform: (content) => {
+        transform: content => {
           const jsonContent = JSON.parse(content);
           jsonContent.version = version;
 
           if (config.mode === 'development') {
-            jsonContent['content_security_policy'] = "script-src 'self' 'unsafe-eval'; object-src 'self'";
+            jsonContent.content_security_policy = "script-src 'self' 'unsafe-eval'; object-src 'self'";
           }
 
           return JSON.stringify(jsonContent, null, 2);
@@ -90,9 +106,7 @@ if (config.mode === 'production') {
 }
 
 if (process.env.HMR === 'true') {
-  config.plugins = (config.plugins || []).concat([
-    new ChromeExtensionReloader(),
-  ]);
+  config.plugins = (config.plugins || []).concat([new ChromeExtensionReloader()]);
 }
 
 module.exports = config;
