@@ -2,6 +2,7 @@ import axios from 'axios';
 import { TwitchApi } from '../../types';
 import Channel from '../entities/Channel';
 import Stream from '../entities/Stream';
+import { AudioManager } from './AudioManager';
 import { BrowserActionManager } from './BrowserActionManager';
 import { ClientIdsManager } from './ClientIdsManager';
 import { GamesManager } from './GamesManager';
@@ -18,7 +19,8 @@ class ChannelsManager {
     private clientIdsManager: ClientIdsManager,
     private gamesManager: GamesManager,
     private notificationsManager: NotificationsManager,
-    private browserActionManager: BrowserActionManager
+    private browserActionManager: BrowserActionManager,
+    private audioManager: AudioManager
   ) {
     this.autoRequestTwitchApiInterval = null;
   }
@@ -71,6 +73,7 @@ class ChannelsManager {
 
             if (wasOffline) {
               this.notificationsManager.show(channel);
+              this.audioManager.play('wizz');
             }
           })
           .catch(console.error);
