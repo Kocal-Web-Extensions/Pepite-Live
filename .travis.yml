@@ -28,3 +28,17 @@ script:
   - cmp src/icons/icon_48.png dist/icons/icon_48.png
   - cmp src/icons/icon_128.png dist/icons/icon_128.png
   - test -f "dist-zip/pepite-live-v$(node -pe "require('./package.json').version").zip"
+
+before_deploy:
+  - export RELEASE_EXTENSION_FILE=$(ls dist-zip/*.zip)
+  - echo "Deploying ${RELEASE_EXTENSION_FILE} to GitHub releases"
+
+deploy:
+  provider: releases
+  api_key:
+    secure: G6Zs9Xd4cAnQ05UMllpP6H0IZvFHRnJhPCSa/vKuTN5cCISShSwaBg0tHtTUaVn7ykbzO07E54Ug8fC3Knzbzq1QgDDyJT9jtGpYbgnK9e3C7WmA6UPXFe5t8GjDXbq+sW3eBTP/To2wvthGFnM45RXS74xlqTHoXeAMyMR9CKF8cmkAnl+CFd/51Szv+KDfRkobKmDIuBUFE4Nj0L2t7Fl576cKPrn9SJy51laXgpGPLOWn8w0uWCGVW1L2HdAy5dL5/smwRAGgkpI0dTAZmX5OZ19Olm8sosPDftZ1ZiSIJQuAJj0cNKPav3VB4HTvPuF6AA5Wg6uYot/Oxl2zgHv6xxxDmW40SJ0jtMk3QGUuB7tbiLCkxCEjMrAQPF+K7pH76gR41re+hJBoZEYI5YRUxjRQn4zcIeAoOu+00rgbClQPu0A3+NHdwT/ATl667fQWYrAZXmaoPgQKR1zfIS36VzEA8fKaPQGL+bnUf6/rd71Oj+R0xDzeQ4Y/8sFFj3ZcpgI4I9j4bGN0IciUPPw3g9hqyIvJ2YJF7vMtdCjVCfDnLPMsf7sVD7ZqUWqpunyn6sEt33Yc7xN9ijnJuscj1nCBu08E3UhAJIpDrp3AIhU808oZBzgKmTQ0DYsgmCc0nTxpQCqkNXobcMTWs+1eTAHJOVNKD4lN2czVP8g=
+  file: "${RELEASE_EXTENSION_FILE}"
+  skip_cleanup: true
+  on:
+    repo: Kocal-Web-Extensions/Pepite-Live
+    tags: true
